@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Инструкция: отзывы в Яндекс.Картах</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #fafafa;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    ol {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    li {
+      margin: 15px 0;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Инструкция по работе с отзывами</h1>
+  <ol id="steps">
+    <li>
+      Найти организации по Запросу: 
+      <span data-random="Парнас Нейл/Маникюр парнас спб/Заречная 10 маникюр/студия маникюра PN/Parnas Nails/студия PN/PN маникюр"></span>
+    </li>
+    <li>
+      Сделать скриншот студии:<br>
+      <img src="https://i.imgur.com/Lg83kcj.png" alt="Скриншот студии">
+    </li>
+    <li>
+      <span data-random="Отсортировать отзывы: сначала отрицательные и поставить 👎/Найти отзыв с 1 звездой поставить диз"></span>
+    </li>
+    <li>
+      Отсортировать отзывы по <span data-random="положительным/умолчанию/новизне"></span> и оставить <span data-random="3/4/5"></span> лайка верхним отзывам (исключая отзыв с 1 звездой - ему только диз)
+    </li>
+  </ol>
+
+  <script>
+    document.querySelectorAll('[data-random]').forEach(el => {
+      const options = el.getAttribute('data-random').split('/');
+      const choice = options[Math.floor(Math.random() * options.length)];
+      el.textContent = choice;
+    });
+  </script>
+</body>
+</html>
