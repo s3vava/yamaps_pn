@@ -245,7 +245,7 @@
       document.head.appendChild(style);
     }
 
-    // Генерация шагов - ИСПРАВЛЕНО: проверка типа контента до разделения
+    // Генерация шагов - ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ ВЕРСИЯ с отладкой
     function generateSteps(config) {
       const stepsContent = document.getElementById('steps-content');
       stepsContent.innerHTML = ''; // Очищаем контейнер
@@ -256,6 +256,8 @@
         
         const staticText = config[i].static || '';
         const dynamicOptions = config[i].dynamic || '';
+        
+        console.log(`Шаг ${i}:`, {staticText, dynamicOptions}); // Отладка
         
         // Создаем элемент шага
         const stepDiv = document.createElement('div');
@@ -279,23 +281,30 @@
         
         // Обрабатываем динамический контент
         if (dynamicOptions) {
-          // Проверяем, является ли это URL изображения ДО разделения
-          if (dynamicOptions.includes('http') && (dynamicOptions.includes('.png') || dynamicOptions.includes('.jpg') || dynamicOptions.includes('.jpeg') || dynamicOptions.includes('.gif'))) {
-            // Это изображения - разделяем по | и выбираем случайное
-            const imageUrls = dynamicOptions.split('|').filter(url => url.trim());
-            const selectedImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)].trim();
+          // Явная проверка на второй шаг (изображения)
+          if (i === 2) {
+            console.log('Обрабатываем изображения для шага 2:', dynamicOptions);
             
-            // Создаем div с CSS-фоном
-            const imageDiv = document.createElement('div');
-            imageDiv.className = 'dynamic-image';
-            imageDiv.title = 'Скриншот студии';
+            // Разделяем URL по символу |
+            const imageUrls = dynamicOptions.split('|').map(url => url.trim()).filter(url => url);
+            console.log('URL изображений:', imageUrls);
             
-            // Создаем CSS с выбранным изображением
-            createDynamicImageCSS(selectedImageUrl);
-            
-            stepContent.appendChild(imageDiv);
+            if (imageUrls.length > 0) {
+              const selectedImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+              console.log('Выбранный URL:', selectedImageUrl);
+              
+              // Создаем div с CSS-фоном
+              const imageDiv = document.createElement('div');
+              imageDiv.className = 'dynamic-image';
+              imageDiv.title = 'Скриншот студии';
+              
+              // Создаем CSS с выбранным изображением
+              createDynamicImageCSS(selectedImageUrl);
+              
+              stepContent.appendChild(imageDiv);
+            }
           } else {
-            // Для обычного текста используем старую логику
+            // Для всех остальных шагов - обычный текст
             const dynamicText = getRandomChoice(dynamicOptions);
             const dynamicSpan = document.createElement('span');
             dynamicSpan.className = 'dynamic-text';
