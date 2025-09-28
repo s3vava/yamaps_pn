@@ -209,9 +209,9 @@
       style.textContent = `
         .dynamic-image {
           display: block;
-          width: 100%;
-          max-width: 400px;
-          height: 200px;
+          width: auto;
+          min-height: 400px;
+          max-width: 100%;
           background-image: url('${imageUrl}');
           background-size: cover;
           background-position: center;
@@ -245,7 +245,7 @@
       document.head.appendChild(style);
     }
 
-    // Генерация шагов - ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ ВЕРСИЯ с отладкой
+    // Генерация шагов - ФИНАЛЬНАЯ ВЕРСИЯ без отладки
     function generateSteps(config) {
       const stepsContent = document.getElementById('steps-content');
       stepsContent.innerHTML = ''; // Очищаем контейнер
@@ -256,8 +256,6 @@
         
         const staticText = config[i].static || '';
         const dynamicOptions = config[i].dynamic || '';
-        
-        console.log(`Шаг ${i}:`, {staticText, dynamicOptions}); // Отладка
         
         // Создаем элемент шага
         const stepDiv = document.createElement('div');
@@ -283,15 +281,11 @@
         if (dynamicOptions) {
           // Явная проверка на второй шаг (изображения)
           if (i === 2) {
-            console.log('Обрабатываем изображения для шага 2:', dynamicOptions);
-            
             // Разделяем URL по символу |
             const imageUrls = dynamicOptions.split('|').map(url => url.trim()).filter(url => url);
-            console.log('URL изображений:', imageUrls);
             
             if (imageUrls.length > 0) {
               const selectedImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)];
-              console.log('Выбранный URL:', selectedImageUrl);
               
               // Создаем div с CSS-фоном
               const imageDiv = document.createElement('div');
