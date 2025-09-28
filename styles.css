@@ -7,7 +7,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
   overflow-x: hidden;
   position: relative;
 }
@@ -21,9 +21,9 @@ body::before {
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(120, 219, 226, 0.3) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(52, 73, 94, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(44, 62, 80, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(52, 152, 219, 0.3) 0%, transparent 50%);
   animation: float 20s ease-in-out infinite;
   z-index: -1;
 }
@@ -122,14 +122,14 @@ body::before {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
   padding: 40px;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -158,36 +158,37 @@ h1 {
 }
 
 .steps-container {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 30px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .step {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   padding: 20px;
   margin: 20px 0;
-  color: white;
+  color: #ffffff;
   font-size: 16px;
   line-height: 1.6;
   backdrop-filter: blur(5px);
   transition: all 0.3s ease;
   position: relative;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .step:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.18);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
 }
 
 .step-number {
   display: inline-block;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #3498db, #2c3e50);
   color: white;
   border-radius: 50%;
   width: 30px;
@@ -197,22 +198,27 @@ h1 {
   font-weight: bold;
   margin-right: 15px;
   font-size: 14px;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .step-content {
   display: inline-block;
   vertical-align: top;
   width: calc(100% - 45px);
-  color: white;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .dynamic-text {
-  background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+  background: linear-gradient(135deg, #f39c12, #e67e22);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 600;
+  text-shadow: none;
+  display: inline-block;
+  padding: 2px 0;
 }
 
 /* Обычный текст остается белым */
@@ -235,6 +241,10 @@ img:hover {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  body {
+    background: linear-gradient(135deg, #1a252f 0%, #2c3e50 50%, #1a252f 100%);
+  }
+  
   .container {
     padding: 15px;
   }
@@ -242,15 +252,21 @@ img:hover {
   .glass-card {
     padding: 25px;
     border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
   .steps-container {
     padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
   }
 
   .step {
     padding: 15px;
     font-size: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
 
   .step-number {
@@ -259,30 +275,63 @@ img:hover {
     line-height: 25px;
     font-size: 12px;
     margin-right: 10px;
+    background: linear-gradient(135deg, #3498db, #1a252f);
+    box-shadow: 0 3px 10px rgba(52, 152, 219, 0.5);
   }
 
   .step-content {
     width: calc(100% - 35px);
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
 
   .vpn-check {
     padding: 30px 20px;
     margin: 20px;
     font-size: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .dynamic-text {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: contrast(1.2) brightness(1.1);
   }
 }
 
 @media (max-width: 480px) {
+  body {
+    background: linear-gradient(135deg, #0f1419 0%, #1a252f 50%, #0f1419 100%);
+  }
+  
   .step-number {
     display: block;
     margin: 0 0 10px 0;
     width: 25px;
     height: 25px;
+    background: linear-gradient(135deg, #3498db, #0f1419);
   }
 
   .step-content {
     width: 100%;
     display: block;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  
+  .step {
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
   }
 }
 
