@@ -5,58 +5,512 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Инструкция: отзывы в Яндекс.Картах</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 0 20px;
-      background: #fafafa;
-      color: #333;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(120, 219, 226, 0.3) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-30px) rotate(2deg); }
+      66% { transform: translateY(15px) rotate(-1deg); }
+    }
+
+    /* VPN Check Overlay */
+    .vpn-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .vpn-check {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      color: white;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    }
+
     h1 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      color: white;
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    ol {
-      background: #fff;
-      padding: 20px;
+
+    .steps-container {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .step {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 20px 0;
+      color: white;
+      font-size: 16px;
+      line-height: 1.6;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      position: relative;
     }
-    li {
-      margin: 15px 0;
+
+    .step:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
+
+    .step-number {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      font-weight: bold;
+      margin-right: 15px;
+      font-size: 14px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .step-content {
+      display: inline-block;
+      vertical-align: top;
+      width: calc(100% - 45px);
+    }
+
+    .dynamic-text {
+      background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+    }
+
     img {
       max-width: 100%;
-      border-radius: 8px;
+      height: auto;
+      border-radius: 12px;
+      margin-top: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.02);
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .glass-card {
+        padding: 25px;
+        border-radius: 20px;
+      }
+
+      .steps-container {
+        padding: 20px;
+      }
+
+      .step {
+        padding: 15px;
+        font-size: 14px;
+      }
+
+      .step-number {
+        width: 25px;
+        height: 25px;
+        line-height: 25px;
+        font-size: 12px;
+        margin-right: 10px;
+      }
+
+      .step-content {
+        width: calc(100% - 35px);
+      }
+
+      .vpn-check {
+        padding: 30px 20px;
+        margin: 20px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .step-number {
+        display: block;
+        margin: 0 0 10px 0;
+        width: 25px;
+        height: 25px;
+      }
+
+      .step-content {
+        width: 100%;
+        display: block;
+      }
+    }
+
+    /* Loading animation for content */
+    .content-hidden {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .content-visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
     }
   </style>
 </head>
 <body>
-  <h1>Инструкция по работе с отзывами</h1>
-  <ol id="steps">
-    <li>
-      Найти организации по Запросу: 
-      <span data-random="Парнас Нейл/Маникюр парнас спб/Заречная 10 маникюр/студия маникюра PN/Parnas Nails/студия PN/PN маникюр"></span>
-    </li>
-    <li>
-      Сделать скриншот студии:<br>
-      <img src="https://i.imgur.com/Lg83kcj.png" alt="Скриншот студии">
-    </li>
-    <li>
-      <span data-random="Отсортировать отзывы: сначала отрицательные и поставить 👎/Найти отзыв с 1 звездой поставить диз"></span>
-    </li>
-    <li>
-      Отсортировать отзывы по <span data-random="положительным/умолчанию/новизне"></span> и оставить <span data-random="3/4/5"></span> лайка верхним отзывам (исключая отзыв с 1 звездой - ему только диз)
-    </li>
-  </ol>
+  <!-- VPN Check Overlay -->
+  <div class="vpn-overlay" id="vpnOverlay">
+    <div class="vpn-check">
+      <h2>Проверка подключения...</h2>
+      <div class="loader"></div>
+      <p id="vpnStatus">Проверяем VPN соединение</p>
+      <div class="error-message" id="errorMessage" style="display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container content-hidden" id="mainContent">
+    <div class="glass-card">
+      <h1>Инструкция по работе с отзывами</h1>
+      <div class="steps-container">
+        <div id="steps-content">
+          <!-- Контент загружается динамически -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    document.querySelectorAll('[data-random]').forEach(el => {
-      const options = el.getAttribute('data-random').split('/');
-      const choice = options[Math.floor(Math.random() * options.length)];
-      el.textContent = choice;
+    // Конфигурация по умолчанию
+    const defaultConfig = {
+      '1': {
+        static: 'Найти организации по Запросу: ',
+        dynamic: 'Парнас Нейл/Маникюр парнас спб/Заречная 10 маникюр/студия маникюра PN/Parnas Nails/студия PN/PN маникюр'
+      },
+      '2': {
+        static: 'Сделать скриншот студии:<br>',
+        dynamic: '<img src="https://i.imgur.com/Lg83kcj.png" alt="Скриншот студии">/<img src="https://i.imgur.com/uyifsUrr.png" alt="Скриншот студии">'
+      },
+      '3': {
+        static: '',
+        dynamic: 'Отсортировать отзывы: сначала отрицательные и поставить 👎/Найти отзыв с 1 звездой поставить диз'
+      },
+      '4': {
+        static: 'Отсортировать отзывы по ',
+        dynamic: 'положительным/умолчанию/новизне'
+      },
+      '5': {
+        static: ' и оставить ',
+        dynamic: '3/4/5'
+      },
+      '6': {
+        static: ' лайка верхним отзывам (исключая отзыв с 1 звездой - ему только диз)',
+        dynamic: ''
+      }
+    };
+
+    // VPN проверка
+    async function checkVPN() {
+      const vpnStatus = document.getElementById('vpnStatus');
+      const errorMessage = document.getElementById('errorMessage');
+      
+      const testUrls = [
+        'https://www.facebook.com/robots.txt',
+        'https://twitter.com/robots.txt',
+        'https://discord.com/robots.txt'
+      ];
+
+      let isVPN = false;
+      let checkedCount = 0;
+
+      const checkPromises = testUrls.map(async (url) => {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const response = await fetch(url, {
+            signal: controller.signal,
+            mode: 'no-cors',
+            cache: 'no-cache'
+          });
+          
+          clearTimeout(timeoutId);
+          return true; // Если запрос прошел, значит VPN включен
+        } catch (error) {
+          return false; // Если ошибка, значит ресурс заблокирован (нет VPN)
+        }
+      });
+
+      try {
+        const results = await Promise.allSettled(checkPromises);
+        const successCount = results.filter(result => result.status === 'fulfilled' && result.value === true).length;
+        
+        if (successCount > 0) {
+          vpnStatus.textContent = 'Обнаружено VPN соединение';
+          errorMessage.textContent = 'Пожалуйста, отключите VPN для доступа к сайту';
+          errorMessage.style.display = 'block';
+          
+          // Повторная проверка через 3 секунды
+          setTimeout(checkVPN, 3000);
+          return;
+        }
+        
+        // VPN не обнаружен, можно показать сайт
+        vpnStatus.textContent = 'Проверка завершена';
+        setTimeout(() => {
+          document.getElementById('vpnOverlay').style.display = 'none';
+          showMainContent();
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Ошибка при проверке VPN:', error);
+        // В случае ошибки показываем сайт
+        setTimeout(() => {
+          document.getElementById('vpnOverlay').style.display = 'none';
+          showMainContent();
+        }, 2000);
+      }
+    }
+
+    // Показ основного контента
+    function showMainContent() {
+      const mainContent = document.getElementById('mainContent');
+      mainContent.classList.remove('content-hidden');
+      mainContent.classList.add('content-visible');
+      loadConfig();
+    }
+
+    // Загрузка конфигурации
+    async function loadConfig() {
+      let config = defaultConfig;
+      
+      try {
+        const response = await fetch('text.conf');
+        if (response.ok) {
+          const configText = await response.text();
+          config = parseConfig(configText);
+        }
+      } catch (error) {
+        console.log('Файл конфигурации не найден, используем значения по умолчанию');
+      }
+      
+      generateSteps(config);
+    }
+
+    // Парсинг конфигурации
+    function parseConfig(configText) {
+      const config = {};
+      const lines = configText.split('\n').filter(line => line.trim());
+      
+      lines.forEach(line => {
+        const staticMatch = line.match(/^(\d+)\s+static\s*=\s*'([^']*)'/);
+        const dynamicMatch = line.match(/^(\d+)\s+dynamic\s*=\s*'([^']*)'/);
+        
+        if (staticMatch) {
+          const [, stepNum, staticText] = staticMatch;
+          if (!config[stepNum]) config[stepNum] = {};
+          config[stepNum].static = staticText;
+        }
+        
+        if (dynamicMatch) {
+          const [, stepNum, dynamicText] = dynamicMatch;
+          if (!config[stepNum]) config[stepNum] = {};
+          config[stepNum].dynamic = dynamicText;
+        }
+      });
+      
+      return config;
+    }
+
+    // Генерация шагов
+    function generateSteps(config) {
+      const stepsContent = document.getElementById('steps-content');
+      let html = '';
+      
+      // Объединяем шаги 4, 5, 6 в один
+      const step4Text = (config['4']?.static || '') + 
+                       getRandomChoice(config['4']?.dynamic || '') + 
+                       (config['5']?.static || '') + 
+                       getRandomChoice(config['5']?.dynamic || '') + 
+                       (config['6']?.static || '');
+      
+      // Генерируем первые 3 шага
+      for (let i = 1; i <= 3; i++) {
+        if (config[i]) {
+          const staticText = config[i].static || '';
+          const dynamicText = getRandomChoice(config[i].dynamic || '');
+          
+          html += `
+            <div class="step">
+              <span class="step-number">${i}</span>
+              <div class="step-content">
+                ${staticText}<span class="dynamic-text">${dynamicText}</span>
+              </div>
+            </div>
+          `;
+        }
+      }
+      
+      // Добавляем объединенный 4 шаг
+      if (step4Text.trim()) {
+        html += `
+          <div class="step">
+            <span class="step-number">4</span>
+            <div class="step-content">
+              <span class="dynamic-text">${step4Text}</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      stepsContent.innerHTML = html;
+    }
+
+    // Получение случайного выбора из строки с разделителями
+    function getRandomChoice(text) {
+      if (!text) return '';
+      const choices = text.split('/').filter(choice => choice.trim());
+      if (choices.length === 0) return text;
+      return choices[Math.floor(Math.random() * choices.length)];
+    }
+
+    // Запуск проверки VPN при загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+      checkVPN();
     });
   </script>
 </body>
