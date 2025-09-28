@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Инструкция: отзывы в Яндекс.Картах</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <!-- VPN Check Overlay -->
@@ -201,18 +201,18 @@
         const dynamicOptions = config[i].dynamic || '';
         const dynamicText = getRandomChoice(dynamicOptions);
         
-        // Добавляем статический текст (если есть)
+        // Добавляем статический текст (если есть) - всегда белый
         if (staticText) {
           content += staticText;
         }
         
         // Добавляем динамический текст (если есть)
         if (dynamicText) {
-          // Проверяем, содержит ли текст HTML теги
-          if (dynamicText.includes('<img') || dynamicText.includes('<br>')) {
-            // Для HTML контента не применяем класс dynamic-text к самому контенту
+          if (dynamicText.includes('<img')) {
+            // Для изображений добавляем как есть
             content += dynamicText;
           } else {
+            // Для текста добавляем стиль
             content += `<span class="dynamic-text">${dynamicText}</span>`;
           }
         }
@@ -224,22 +224,22 @@
           const step6Static = config['6']?.static || '';
           const step6Dynamic = getRandomChoice(config['6']?.dynamic || '');
           
-          // Добавляем статический текст шага 5
+          // Статический текст шага 5 (белый)
           if (step5Static) {
             content += step5Static;
           }
           
-          // Добавляем динамический текст шага 5
+          // Динамический текст шага 5 (цветной)
           if (step5Dynamic) {
             content += `<span class="dynamic-text">${step5Dynamic}</span>`;
           }
           
-          // Добавляем статический текст шага 6
+          // Статический текст шага 6 (белый)
           if (step6Static) {
             content += step6Static;
           }
           
-          // Добавляем динамический текст шага 6
+          // Динамический текст шага 6 (цветной)
           if (step6Dynamic) {
             content += `<span class="dynamic-text">${step6Dynamic}</span>`;
           }
