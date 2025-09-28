@@ -83,7 +83,7 @@
       const checkPromises = testUrls.map(async (url) => {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          const timeoutId = setTimeout(() => controller.abort(), 2000); // Сокращено до 2 секунд
           
           const response = await fetch(url, {
             signal: controller.signal,
@@ -118,7 +118,7 @@
         setTimeout(() => {
           document.getElementById('vpnOverlay').style.display = 'none';
           showMainContent();
-        }, 1000);
+        }, 500);
         
       } catch (error) {
         console.error('Ошибка при проверке VPN:', error);
@@ -126,7 +126,7 @@
         setTimeout(() => {
           document.getElementById('vpnOverlay').style.display = 'none';
           showMainContent();
-        }, 2000);
+        }, 1000);
       }
     }
 
@@ -146,19 +146,27 @@
     }
 
     // Загрузка конфигурации
-    async function loadConfig() {
-      let config = defaultConfig;
+    function loadConfig() {
+      // Имитируем загрузку конфигурации из text.conf
+      const configText = `1 static='Найти организацию в Я.картах по запросу: '
+1 dynamic='Парнас Нейл/Маникюр парнас спб/Заречная 10 маникюр/студия маникюра PN/Parnas Nails/студия PN/PN маникюр/Ликс нейл/Наутика/Студия маникюра'
+
+2 static='Сделать скриншот студии: '
+2 dynamic='<img src="https://i.imgur.com/Lg83kcj.png" alt="Скриншот студии">/<img src="https://i.imgur.com/6tDrEtv.png" alt="Скриншот студии">'
+
+3 static='Перейти во вкладку отзывы и '
+3 dynamic=' Отсортировать отзывы: сначала отрицательные и поставить 👎 2-м верхним/ Найти отзыв с 1 звездой поставить диз/ Отсортировать по самым новым и поставить лайк 3-м положительным отзывам'
+
+4 static='Отсортировать отзывы по '
+4 dynamic='положительным/умолчанию/новизне'
+
+5 static=' Поставить лайк для положительных отзывов: '
+5 dynamic='3-м отзывам/4-м отзывам/5-ти отзывам'
+
+6 static='Выполнить целевое действие: '
+6 dynamic='Нажать на номер телефона/Перейти на сайт/Построить маршрут от метро Парнас до студии'`;
       
-      try {
-        const response = await fetch('text.conf');
-        if (response.ok) {
-          const configText = await response.text();
-          config = parseConfig(configText);
-        }
-      } catch (error) {
-        console.log('Файл конфигурации не найден, используем значения по умолчанию');
-      }
-      
+      const config = parseConfig(configText);
       generateSteps(config);
     }
 
@@ -187,13 +195,13 @@
       return config;
     }
 
-    // Генерация шагов
+    // Генерация шагов - ИСПРАВЛЕНО: теперь генерирует все 6 шагов отдельно
     function generateSteps(config) {
       const stepsContent = document.getElementById('steps-content');
       let html = '';
       
-      // Генерируем шаги 1-4
-      for (let i = 1; i <= 4; i++) {
+      // Генерируем все 6 шагов отдельно
+      for (let i = 1; i <= 6; i++) {
         if (!config[i]) continue;
         
         let content = '';
@@ -209,39 +217,11 @@
         // Добавляем динамический текст (если есть)
         if (dynamicText) {
           if (dynamicText.includes('<img')) {
-            // Для изображений добавляем как есть
+            // Для изображений добавляем как есть - ИСПРАВЛЕНО: используем innerHTML
             content += dynamicText;
           } else {
             // Для текста добавляем стиль
             content += `<span class="dynamic-text">${dynamicText}</span>`;
-          }
-        }
-        
-        // Для шага 4 добавляем содержимое шагов 5 и 6
-        if (i === 4) {
-          const step5Static = config['5']?.static || '';
-          const step5Dynamic = getRandomChoice(config['5']?.dynamic || '');
-          const step6Static = config['6']?.static || '';
-          const step6Dynamic = getRandomChoice(config['6']?.dynamic || '');
-          
-          // Статический текст шага 5 (белый)
-          if (step5Static) {
-            content += step5Static;
-          }
-          
-          // Динамический текст шага 5 (цветной)
-          if (step5Dynamic) {
-            content += `<span class="dynamic-text">${step5Dynamic}</span>`;
-          }
-          
-          // Статический текст шага 6 (белый)
-          if (step6Static) {
-            content += step6Static;
-          }
-          
-          // Динамический текст шага 6 (цветной)
-          if (step6Dynamic) {
-            content += `<span class="dynamic-text">${step6Dynamic}</span>`;
           }
         }
         
