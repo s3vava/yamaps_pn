@@ -32,59 +32,64 @@
 
   <script>
   // VPN проверка
-  async function checkVPN() {
-    const vpnStatus = document.getElementById('vpnStatus');
-    const errorMessage = document.getElementById('errorMessage');
-    const checkButton = document.getElementById('checkButton');
-    const loader = document.getElementById('loader');
-    
-    loader.style.display = 'block';
-    checkButton.style.display = 'none';
-    errorMessage.style.display = 'none';
-    
-    const testUrls = [
-      'https://www.facebook.com/robots.txt',
-      'https://twitter.com/robots.txt',
-      'https://discord.com/robots.txt'
-    ];
+async function checkVPN() {
+  const vpnStatus = document.getElementById('vpnStatus');
+  const errorMessage = document.getElementById('errorMessage');
+  const checkButton = document.getElementById('checkButton');
+  const loader = document.getElementById('loader');
+
+  loader.style.display = 'block';
+  checkButton.style.display = 'none';
+  errorMessage.style.display = 'none';
+
+  const testUrls = [
+    'https://www.facebook.com/robots.txt',
+    'https://twitter.com/robots.txt',
+    'https://discord.com/robots.txt'
+  ];
+
+  // функция проверки с таймаутом
+  async function checkUrl(url) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000); // 2 сек максимум
 
     try {
-      const results = await Promise.allSettled(
-        testUrls.map(url =>
-          fetch(url, { mode: 'no-cors', cache: 'no-cache' })
-            .then(() => true)
-            .catch(() => false)
-        )
-      );
-
-      const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
-      if (successCount > 0) {
-        vpnStatus.textContent = 'Обнаружено VPN соединение';
-        errorMessage.textContent = 'Пожалуйста, отключите VPN для доступа к сайту';
-        errorMessage.style.display = 'block';
-        loader.style.display = 'none';
-        checkButton.style.display = 'inline-block';
-        return;
-      }
-
-      vpnStatus.textContent = 'Проверка завершена';
-      setTimeout(() => {
-        document.getElementById('vpnOverlay').style.display = 'none';
-        showMainContent();
-      }, 500);
-
+      await fetch(url, { signal: controller.signal, mode: 'no-cors', cache: 'no-cache' });
+      clearTimeout(timeout);
+      return true;
     } catch {
-      setTimeout(() => {
-        document.getElementById('vpnOverlay').style.display = 'none';
-        showMainContent();
-      }, 1000);
+      clearTimeout(timeout);
+      return false;
     }
   }
 
-  function manualCheck() {
-    document.getElementById('vpnStatus').textContent = 'Проверяем VPN соединение';
-    checkVPN();
+  try {
+    const results = await Promise.allSettled(testUrls.map(checkUrl));
+    const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
+
+    if (successCount > 0) {
+      vpnStatus.textContent = 'Обнаружено VPN соединение';
+      errorMessage.textContent = 'Пожалуйста, отключите VPN для доступа к сайту';
+      errorMessage.style.display = 'block';
+      loader.style.display = 'none';
+      checkButton.style.display = 'inline-block';
+      return;
+    }
+
+    vpnStatus.textContent = 'Проверка завершена';
+    setTimeout(() => {
+      document.getElementById('vpnOverlay').style.display = 'none';
+      showMainContent();
+    }, 200);
+
+  } catch (e) {
+    console.error('Ошибка проверки VPN:', e);
+    setTimeout(() => {
+      document.getElementById('vpnOverlay').style.display = 'none';
+      showMainContent();
+    }, 200);
   }
+}
 
   function showMainContent() {
     const mainContent = document.getElementById('mainContent');
