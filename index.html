@@ -184,6 +184,7 @@
       display: inline-block;
       vertical-align: top;
       width: calc(100% - 45px);
+      color: white;
     }
 
     .dynamic-text {
@@ -192,6 +193,11 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       font-weight: 600;
+    }
+
+    /* Обычный текст остается белым */
+    .step-content:not(.dynamic-text) {
+      color: white;
     }
 
     img {
@@ -461,40 +467,63 @@
       const stepsContent = document.getElementById('steps-content');
       let html = '';
       
-      // Объединяем шаги 4, 5, 6 в один
-      const step4Text = (config['4']?.static || '') + 
-                       getRandomChoice(config['4']?.dynamic || '') + 
-                       (config['5']?.static || '') + 
-                       getRandomChoice(config['5']?.dynamic || '') + 
-                       (config['6']?.static || '');
+      // Генерируем все шаги по порядку
+      const maxSteps = Math.max(...Object.keys(config).map(k => parseInt(k)));
       
-      // Генерируем первые 3 шага
-      for (let i = 1; i <= 3; i++) {
+      for (let i = 1; i <= maxSteps; i++) {
         if (config[i]) {
           const staticText = config[i].static || '';
-          const dynamicText = getRandomChoice(config[i].dynamic || '');
+          const dynamicOptions = config[i].dynamic || '';
+          const dynamicText = getRandomChoice(dynamicOptions);
+          
+          let content = '';
+          
+          // Если есть статический текст
+          if (staticText) {
+            content += staticText;
+          }
+          
+          // Если есть динамический текст
+          if (dynamicText) {
+            // Проверяем, содержит ли динамический текст HTML теги (например, img)
+            if (dynamicText.includes('<img')) {
+              content += `<span class="dynamic-text">${dynamicText}</span>`;
+            } else {
+              content += `<span class="dynamic-text">${dynamicText}</span>`;
+            }
+          }
+          
+          // Особая обработка для шага 4 - объединяем с шагами 5 и 6
+          if (i === 4) {
+            const step5Static = config['5']?.static || '';
+            const step5Dynamic = getRandomChoice(config['5']?.dynamic || '');
+            const step6Static = config['6']?.static || '';
+            const step6Dynamic = getRandomChoice(config['6']?.dynamic || '');
+            
+            content += step5Static;
+            if (step5Dynamic) {
+              content += `<span class="dynamic-text">${step5Dynamic}</span>`;
+            }
+            content += step6Static;
+            if (step6Dynamic) {
+              content += `<span class="dynamic-text">${step6Dynamic}</span>`;
+            }
+          }
+          
+          // Пропускаем шаги 5 и 6, так как они объединены с 4-м
+          if (i === 5 || i === 6) {
+            continue;
+          }
           
           html += `
             <div class="step">
               <span class="step-number">${i}</span>
               <div class="step-content">
-                ${staticText}<span class="dynamic-text">${dynamicText}</span>
+                ${content}
               </div>
             </div>
           `;
         }
-      }
-      
-      // Добавляем объединенный 4 шаг
-      if (step4Text.trim()) {
-        html += `
-          <div class="step">
-            <span class="step-number">4</span>
-            <div class="step-content">
-              <span class="dynamic-text">${step4Text}</span>
-            </div>
-          </div>
-        `;
       }
       
       stepsContent.innerHTML = html;
