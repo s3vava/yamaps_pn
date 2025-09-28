@@ -245,7 +245,7 @@
       document.head.appendChild(style);
     }
 
-    // Генерация шагов - НОВАЯ ВЕРСИЯ с поддержкой CSS изображений
+    // Генерация шагов - ИСПРАВЛЕНО: проверка типа контента до разделения
     function generateSteps(config) {
       const stepsContent = document.getElementById('steps-content');
       stepsContent.innerHTML = ''; // Очищаем контейнер
@@ -256,7 +256,6 @@
         
         const staticText = config[i].static || '';
         const dynamicOptions = config[i].dynamic || '';
-        const dynamicText = getRandomChoice(dynamicOptions);
         
         // Создаем элемент шага
         const stepDiv = document.createElement('div');
@@ -278,21 +277,26 @@
           stepContent.appendChild(staticSpan);
         }
         
-        // Добавляем динамический текст или изображение
-        if (dynamicText) {
-          // Проверяем, является ли это URL изображения (содержит http и расширение изображения)
-          if (dynamicText.includes('http') && (dynamicText.includes('.png') || dynamicText.includes('.jpg') || dynamicText.includes('.jpeg') || dynamicText.includes('.gif'))) {
-            // Это изображение - создаем div с CSS-фоном
+        // Обрабатываем динамический контент
+        if (dynamicOptions) {
+          // Проверяем, является ли это URL изображения ДО разделения
+          if (dynamicOptions.includes('http') && (dynamicOptions.includes('.png') || dynamicOptions.includes('.jpg') || dynamicOptions.includes('.jpeg') || dynamicOptions.includes('.gif'))) {
+            // Это изображения - разделяем по | и выбираем случайное
+            const imageUrls = dynamicOptions.split('|').filter(url => url.trim());
+            const selectedImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)].trim();
+            
+            // Создаем div с CSS-фоном
             const imageDiv = document.createElement('div');
             imageDiv.className = 'dynamic-image';
             imageDiv.title = 'Скриншот студии';
             
             // Создаем CSS с выбранным изображением
-            createDynamicImageCSS(dynamicText);
+            createDynamicImageCSS(selectedImageUrl);
             
             stepContent.appendChild(imageDiv);
           } else {
-            // Для обычного текста создаем span с классом dynamic-text
+            // Для обычного текста используем старую логику
+            const dynamicText = getRandomChoice(dynamicOptions);
             const dynamicSpan = document.createElement('span');
             dynamicSpan.className = 'dynamic-text';
             dynamicSpan.textContent = dynamicText;
@@ -309,20 +313,11 @@
       }
     }
 
-    // Получение случайного выбора из строки с разделителями - ИСПРАВЛЕНО для URL
+    // Получение случайного выбора из строки с разделителями - упрощенная версия только для текста
     function getRandomChoice(text) {
       if (!text) return '';
       
-      // Проверяем, содержит ли текст URL (имеет http)
-      if (text.includes('http')) {
-        // Для URL используем разделитель "|"
-        const choices = text.split('|').filter(choice => choice.trim());
-        if (choices.length > 0) {
-          return choices[Math.floor(Math.random() * choices.length)].trim();
-        }
-      }
-      
-      // Обычная логика для текста с разделителем "/"
+      // Только для обычного текста с разделителем "/"
       const choices = text.split('/').filter(choice => choice.trim());
       if (choices.length === 0) return text;
       return choices[Math.floor(Math.random() * choices.length)].trim();
