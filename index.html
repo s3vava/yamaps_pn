@@ -31,190 +31,202 @@
   </div>
 
   <script>
-  // VPN проверка
-async function checkVPN() {
-  const vpnStatus = document.getElementById('vpnStatus');
-  const errorMessage = document.getElementById('errorMessage');
-  const checkButton = document.getElementById('checkButton');
-  const loader = document.getElementById('loader');
+    // VPN проверка
+    async function checkVPN() {
+      const vpnStatus = document.getElementById('vpnStatus');
+      const errorMessage = document.getElementById('errorMessage');
+      const checkButton = document.getElementById('checkButton');
+      const loader = document.getElementById('loader');
 
-  loader.style.display = 'block';
-  checkButton.style.display = 'none';
-  errorMessage.style.display = 'none';
+      loader.style.display = 'block';
+      checkButton.style.display = 'none';
+      errorMessage.style.display = 'none';
 
-  const testUrls = [
-    'https://www.facebook.com/robots.txt',
-    'https://twitter.com/robots.txt',
-    'https://discord.com/robots.txt'
-  ];
+      const testUrls = [
+        'https://www.facebook.com/robots.txt',
+        'https://twitter.com/robots.txt',
+        'https://discord.com/robots.txt'
+      ];
 
-  // функция проверки с таймаутом
-  async function checkUrl(url) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000); // 2 сек максимум
-
-    try {
-      await fetch(url, { signal: controller.signal, mode: 'no-cors', cache: 'no-cache' });
-      clearTimeout(timeout);
-      return true;
-    } catch {
-      clearTimeout(timeout);
-      return false;
-    }
-  }
-
-  try {
-    const results = await Promise.allSettled(testUrls.map(checkUrl));
-    const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
-
-    if (successCount > 0) {
-      vpnStatus.textContent = 'Обнаружено VPN соединение';
-      errorMessage.textContent = 'Пожалуйста, отключите VPN для доступа к сайту';
-      errorMessage.style.display = 'block';
-      loader.style.display = 'none';
-      checkButton.style.display = 'inline-block';
-      return;
-    }
-
-    vpnStatus.textContent = 'Проверка завершена';
-    setTimeout(() => {
-      document.getElementById('vpnOverlay').style.display = 'none';
-      showMainContent();
-    }, 200);
-
-  } catch (e) {
-    console.error('Ошибка проверки VPN:', e);
-    setTimeout(() => {
-      document.getElementById('vpnOverlay').style.display = 'none';
-      showMainContent();
-    }, 200);
-  }
-}
-
-  function showMainContent() {
-    const mainContent = document.getElementById('mainContent');
-    mainContent.classList.remove('content-hidden');
-    mainContent.classList.add('content-visible');
-    loadConfig();
-  }
-
-  // Загружаем text.conf
-  async function loadConfig() {
-    try {
-      const response = await fetch('text.conf?nocache=' + Date.now());
-      const configText = await response.text();
-      const config = parseConfig(configText);
-      generateSteps(config);
-    } catch (e) {
-      console.error('Ошибка загрузки text.conf:', e);
-    }
-  }
-
-  // Парсинг text.conf
-  function parseConfig(configText) {
-    const config = {};
-    const lines = configText.split('\n').filter(line => line.trim());
-
-    lines.forEach(line => {
-      const staticMatch = line.match(/^(\d+)\s+static\s*=\s*'([^']*)'/);
-      const dynamicMatch = line.match(/^(\d+)\s+dynamic\s*=\s*'([^']*)'/);
-
-      if (staticMatch) {
-        const [, stepNum, staticText] = staticMatch;
-        if (!config[stepNum]) config[stepNum] = {};
-        config[stepNum].static = staticText;
-      }
-
-      if (dynamicMatch) {
-        const [, stepNum, dynamicText] = dynamicMatch;
-        if (!config[stepNum]) config[stepNum] = {};
-        config[stepNum].dynamic = dynamicText;
-      }
-    });
-
-    return config;
-  }
-
-  function createDynamicImageCSS(imageUrl) {
-    const existingStyle = document.getElementById('dynamic-image-style');
-    if (existingStyle) existingStyle.remove();
-
-    const style = document.createElement('style');
-    style.id = 'dynamic-image-style';
-    style.textContent = `
-      .dynamic-image {
-        display: block;
-        min-height: 270px;
-        max-width: 100%;
-        background-image: url('${imageUrl}');
-        background-size: contain;
-        background-position: top;
-        background-repeat: no-repeat;
-        border-radius: 12px;
-        margin-top: 15px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  function generateSteps(config) {
-    const stepsContent = document.getElementById('steps-content');
-    stepsContent.innerHTML = '';
-
-    for (let i = 1; i <= 6; i++) {
-      if (!config[i]) continue;
-
-      const staticText = config[i].static || '';
-      const dynamicOptions = config[i].dynamic || '';
-
-      const stepDiv = document.createElement('div');
-      stepDiv.className = 'step';
-
-      const stepNumber = document.createElement('span');
-      stepNumber.className = 'step-number';
-      stepNumber.textContent = i;
-
-      const stepContent = document.createElement('div');
-      stepContent.className = 'step-content';
-
-      if (staticText) {
-        const staticSpan = document.createElement('span');
-        staticSpan.innerHTML = staticText;
-        stepContent.appendChild(staticSpan);
-      }
-
-      if (dynamicOptions) {
-        if (i === 2) {
-          const imageUrls = dynamicOptions.split('|').map(u => u.trim()).filter(Boolean);
-          const selectedImage = imageUrls[Math.floor(Math.random() * imageUrls.length)];
-          const imageDiv = document.createElement('div');
-          imageDiv.className = 'dynamic-image';
-          imageDiv.title = 'Скриншот студии';
-          createDynamicImageCSS(selectedImage);
-          stepContent.appendChild(imageDiv);
-        } else {
-          const dynamicText = getRandomChoice(dynamicOptions);
-          const dynamicSpan = document.createElement('span');
-          dynamicSpan.className = 'dynamic-text';
-          dynamicSpan.textContent = dynamicText;
-          stepContent.appendChild(dynamicSpan);
+      async function checkUrl(url) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2000); // 2 сек максимум
+        try {
+          await fetch(url, { signal: controller.signal, mode: 'no-cors', cache: 'no-cache' });
+          clearTimeout(timeout);
+          return true;
+        } catch {
+          clearTimeout(timeout);
+          return false;
         }
       }
 
-      stepDiv.appendChild(stepNumber);
-      stepDiv.appendChild(stepContent);
-      stepsContent.appendChild(stepDiv);
+      try {
+        const results = await Promise.allSettled(testUrls.map(checkUrl));
+        const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
+
+        if (successCount > 0) {
+          vpnStatus.textContent = 'Обнаружено VPN соединение';
+          errorMessage.textContent = 'Пожалуйста, отключите VPN для доступа к сайту';
+          errorMessage.style.display = 'block';
+          loader.style.display = 'none';
+          checkButton.style.display = 'inline-block';
+          return;
+        }
+
+        vpnStatus.textContent = 'Проверка завершена';
+        setTimeout(() => {
+          document.getElementById('vpnOverlay').style.display = 'none';
+          showMainContent();
+        }, 200);
+
+      } catch (e) {
+        console.error('Ошибка проверки VPN:', e);
+        setTimeout(() => {
+          document.getElementById('vpnOverlay').style.display = 'none';
+          showMainContent();
+        }, 200);
+      }
     }
-  }
 
-  function getRandomChoice(text) {
-    const choices = text.split('/').map(c => c.trim()).filter(Boolean);
-    return choices.length > 0 ? choices[Math.floor(Math.random() * choices.length)] : text;
-  }
+    function manualCheck() {
+      document.getElementById('vpnStatus').textContent = 'Проверяем VPN соединение';
+      checkVPN();
+    }
 
-  document.addEventListener('DOMContentLoaded', checkVPN);
-</script>
+    function showMainContent() {
+      const mainContent = document.getElementById('mainContent');
+      mainContent.classList.remove('content-hidden');
+      mainContent.classList.add('content-visible');
+      loadConfig();
+    }
 
+    // Загружаем text.conf
+    async function loadConfig() {
+      try {
+        const response = await fetch('text.conf?nocache=' + Date.now());
+        const configText = await response.text();
+        const config = parseConfig(configText);
+        generateSteps(config);
+      } catch (e) {
+        console.error('Ошибка загрузки text.conf:', e);
+      }
+    }
+
+    // Парсинг text.conf
+    function parseConfig(configText) {
+      const config = {};
+      const lines = configText.split('\n').filter(line => line.trim());
+
+      lines.forEach(line => {
+        const staticMatch = line.match(/^(\d+)\s+static\s*=\s*'([^']*)'/);
+        const dynamicMatch = line.match(/^(\d+)\s+dynamic\s*=\s*'([^']*)'/);
+
+        if (staticMatch) {
+          const [, stepNum, staticText] = staticMatch;
+          if (!config[stepNum]) config[stepNum] = {};
+          config[stepNum].static = staticText;
+        }
+
+        if (dynamicMatch) {
+          const [, stepNum, dynamicText] = dynamicMatch;
+          if (!config[stepNum]) config[stepNum] = {};
+          config[stepNum].dynamic = dynamicText;
+        }
+      });
+
+      return config;
+    }
+
+    function createDynamicImageCSS(imageUrl) {
+      const existingStyle = document.getElementById('dynamic-image-style');
+      if (existingStyle) existingStyle.remove();
+
+      const style = document.createElement('style');
+      style.id = 'dynamic-image-style';
+      style.textContent = `
+        .dynamic-image {
+          display: block;
+          min-height: 270px;
+          max-width: 100%;
+          background-image: url('${imageUrl}');
+          background-size: contain;
+          background-position: top;
+          background-repeat: no-repeat;
+          border-radius: 12px;
+          margin-top: 15px;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    function generateSteps(config) {
+      const stepsContent = document.getElementById('steps-content');
+      stepsContent.innerHTML = '';
+
+      for (let i = 1; i <= 6; i++) {
+        if (!config[i]) continue;
+
+        const staticText = config[i].static || '';
+        const dynamicOptions = config[i].dynamic || '';
+
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'step';
+
+        const stepNumber = document.createElement('span');
+        stepNumber.className = 'step-number';
+        stepNumber.textContent = i;
+
+        const stepContent = document.createElement('div');
+        stepContent.className = 'step-content';
+
+        if (staticText) {
+          const staticSpan = document.createElement('span');
+          staticSpan.innerHTML = staticText;
+          stepContent.appendChild(staticSpan);
+        }
+
+        if (dynamicOptions) {
+          if (i === 2) {
+            const imageUrls = dynamicOptions.split('|').map(u => u.trim()).filter(Boolean);
+            const idx = Math.floor(Math.random() * imageUrls.length);
+            const selectedImage = imageUrls[idx];
+
+            // вывод в консоль
+            console.log(`${i}:${idx + 1}`);
+
+            const imageDiv = document.createElement('div');
+            imageDiv.className = 'dynamic-image';
+            imageDiv.title = 'Скриншот студии';
+            createDynamicImageCSS(selectedImage);
+            stepContent.appendChild(imageDiv);
+          } else {
+            const { choice, index } = getRandomChoice(dynamicOptions);
+            const dynamicSpan = document.createElement('span');
+            dynamicSpan.className = 'dynamic-text';
+            dynamicSpan.textContent = choice;
+            stepContent.appendChild(dynamicSpan);
+
+            // вывод в консоль
+            console.log(`${i}:${index + 1}`);
+          }
+        }
+
+        stepDiv.appendChild(stepNumber);
+        stepDiv.appendChild(stepContent);
+        stepsContent.appendChild(stepDiv);
+      }
+    }
+
+    function getRandomChoice(text) {
+      const choices = text.split('/').map(c => c.trim()).filter(Boolean);
+      if (choices.length === 0) return { choice: text, index: 0 };
+      const idx = Math.floor(Math.random() * choices.length);
+      return { choice: choices[idx], index: idx };
+    }
+
+    document.addEventListener('DOMContentLoaded', checkVPN);
+  </script>
 </body>
 </html>
