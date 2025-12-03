@@ -10,6 +10,7 @@ body {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
   overflow-x: hidden;
   position: relative;
+  padding-top: 100px;
 }
 
 /* Animated background */
@@ -112,13 +113,10 @@ body::before {
 
 /* Main Content */
 .container {
-  max-width: 900px;
+  width: 95%;
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .glass-card {
@@ -126,7 +124,7 @@ body::before {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
-  padding: 40px;
+  padding: 20px;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -145,24 +143,28 @@ body::before {
 }
 
 h1 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   text-align: center;
-  margin-bottom: 30px;
+  padding: 20px;
+  margin: 0;
   color: white;
-  font-size: clamp(24px, 4vw, 32px);
+  font-size: clamp(20px, 4vw, 28px);
   font-weight: 700;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(135deg, rgba(44, 62, 80, 0.95) 0%, rgba(52, 73, 94, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .steps-container {
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   border-radius: 16px;
-  padding: 30px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px;
 }
 
 .step {
@@ -251,6 +253,7 @@ h1 {
 @media (max-width: 768px) {
   body {
     background: #0d1117;
+    padding-top: 80px;
   }
 
   body::before {
@@ -261,8 +264,14 @@ h1 {
     padding: 15px;
   }
 
+  h1 {
+    font-size: clamp(16px, 5vw, 22px);
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(13, 17, 23, 0.98) 0%, rgba(20, 20, 20, 0.98) 100%);
+  }
+
   .glass-card {
-    padding: 25px;
+    padding: 20px;
     border-radius: 20px;
     background: rgba(20, 20, 20, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -270,9 +279,7 @@ h1 {
   }
 
   .steps-container {
-    padding: 20px;
-    background: rgba(30, 30, 30, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px;
   }
 
   .step {
@@ -307,14 +314,6 @@ h1 {
     border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  h1 {
-    color: #ffffff;
-    background: none;
-    -webkit-background-clip: unset;
-    -webkit-text-fill-color: unset;
-    text-shadow: 0 3px 6px rgba(0,0,0,0.7);
-  }
-
   .dynamic-text {
     color: #ffb347;
     background: none;
@@ -335,6 +334,12 @@ h1 {
 @media (max-width: 480px) {
   body {
     background: #0a0f14;
+    padding-top: 70px;
+  }
+
+  h1 {
+    font-size: clamp(14px, 5vw, 18px);
+    padding: 12px;
   }
 
   .step-number {
