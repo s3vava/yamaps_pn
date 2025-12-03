@@ -213,6 +213,16 @@
           }
         }
 
+        // Добавляем кнопку для первого шага
+        if (i === 1) {
+          const buttonLink = document.createElement('a');
+          buttonLink.href = 'https://p-n.spb.ru/yamaps/';
+          buttonLink.target = '_blank';
+          buttonLink.className = 'action-button';
+          buttonLink.textContent = 'Перейти в карты';
+          stepContent.appendChild(buttonLink);
+        }
+
         stepDiv.appendChild(stepNumber);
         stepDiv.appendChild(stepContent);
         stepsContent.appendChild(stepDiv);
